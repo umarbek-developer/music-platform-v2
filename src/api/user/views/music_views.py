@@ -35,15 +35,14 @@ class MusicCreateAPIView(CreateAPIView):
     serializer_class = music_seralizers.MusicCreateSeralizer
     permission_classes = [IsAuthenticated]
 
-    def create(self, request):
-        data = request.data
-        data['author'] = request.user.id
-        ser = self.serializer_class(data=data)
-        if ser.is_valid(raise_exception=True):
-            ser.save()
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user)
+
+    def create(self, request, *args, **kwargs):
+        response = super().create(request, *args, **kwargs)
         return Response({
             "msg": "Music created successfully",
-            "data": ser.data
+            "data": response.data
         }, status=status.HTTP_201_CREATED)
 
 
