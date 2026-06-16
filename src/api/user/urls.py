@@ -23,16 +23,12 @@ urlpatterns = [
     # user favourite
     path('favourite/', favourite_music.FavouriteListApiView.as_view()),
     path('favourite/create/', favourite_music.FavouriteCreateAPIView.as_view()),
-    path('favourite/detail/<int:pk>/', favourite_music.FavouriteRetrieveAPIView.as_view()),
     path('favourite/delete/<int:pk>/', favourite_music.FavouriteDestroyAPIView.as_view()),
-    path('favourite/update/<int:pk>/', favourite_music.FavouriteUpdateAPIView.as_view()),
 
     # user favourite playlist
-    path('favourite-palylist/', favourite_playlist_views.FavouriteplaylistListApiView.as_view()),
-    path('favourite-palylist/create/', favourite_playlist_views.FavouriteplaylistCreateAPIView.as_view()),
-    path('favourite-palylist/detail/<int:pk>/', favourite_playlist_views.FavouriteplaylistRetrieveAPIView.as_view()),
-    path('favourite-palylist/delete/<int:pk>/', favourite_playlist_views.FavouriteplaylistDestroyAPIView.as_view()),
-    path('favourite-palylist/update/<int:pk>/', favourite_playlist_views.FavouriteplaylistUpdateAPIView.as_view()),
+    path('favourite-playlist/', favourite_playlist_views.FavouriteplaylistListApiView.as_view()),
+    path('favourite-playlist/create/', favourite_playlist_views.FavouriteplaylistCreateAPIView.as_view()),
+    path('favourite-playlist/delete/<int:pk>/', favourite_playlist_views.FavouriteplaylistDestroyAPIView.as_view()),
 
 
     # path('', include(router.urls)),

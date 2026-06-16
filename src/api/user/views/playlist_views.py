@@ -11,6 +11,20 @@ class PlaylistListApiView(ListAPIView):
     queryset = Playlist.objects.filter(is_public=True)
     serializer_class = playlist_seralizers.PlaylistListSeralizer
     permission_classes = [IsAuthenticated]
+    is_mine = None
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        if self.is_mine:
+            queryset =  Playlist.objects.filter(author=self.request.user)
+        return queryset
+    
+
+    def list(self, request, *args, **kwargs):
+        self.is_mine =  request.GET.get("is_mine", False)
+        self.playlist = request.GET.get("playlist", False)
+        return super().list(request, *args, **kwargs)
+
 
 
 class PlaylistCreateAPIView(CreateAPIView):
@@ -75,10 +89,12 @@ class PlaylistDestroyAPIView(DestroyAPIView):
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
-        print("inst", instance.author)
         if request.user == instance.author:
             instance.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+            status_code = status.HTTP_204_NO_CONTENT
+        else:
+            status_code = status.HTTP_404_NOT_FOUND
+        return Response(status=status_code)
 
 
 
