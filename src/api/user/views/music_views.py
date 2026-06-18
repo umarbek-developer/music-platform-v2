@@ -1,22 +1,23 @@
 from rest_framework.generics import ListAPIView,\
     CreateAPIView, UpdateAPIView, DestroyAPIView, RetrieveAPIView
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from api.user.serializers import music_seralizers
 from rest_framework import status
 from rest_framework.response import Response
+from django.contrib.auth.models import AnonymousUser
 from apps.music.models import Music
 
 
 class MusicListApiView(ListAPIView):
     queryset = Music.objects.filter(is_public=True)
     serializer_class = music_seralizers.MusicListSeralizer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
     is_mine = False
     playlist = None
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        if self.is_mine:
+        if self.is_mine and type(self.request.user) != AnonymousUser:
             queryset =  Music.objects.filter(author=self.request.user)
         if self.playlist:
             try: playlist = list(map(lambda d: int(d), self.playlist.split(",")))
@@ -35,14 +36,16 @@ class MusicCreateAPIView(CreateAPIView):
     serializer_class = music_seralizers.MusicCreateSeralizer
     permission_classes = [IsAuthenticated]
 
-    def perform_create(self, serializer):
-        serializer.save(author=self.request.user)
-
-    def create(self, request, *args, **kwargs):
-        response = super().create(request, *args, **kwargs)
+    def create(self, request):
+        data = request.data
+        data._mutable = True
+        data['author'] = request.user.id
+        ser = self.serializer_class(data=data)
+        if ser.is_valid(raise_exception=True):
+            ser.save()
         return Response({
             "msg": "Music created successfully",
-            "data": response.data
+            "data": ser.data 
         }, status=status.HTTP_201_CREATED)
 
 
@@ -58,6 +61,7 @@ class MusicUpdateAPIView(UpdateAPIView):
         except: pass
         instance = self.get_object()
         if request.user == instance.author:
+            request.data._mutable = True
             request.data['author'] = request.user.id
             ser = self.serializer_class(instance, data=request.data)
             if ser.is_valid(raise_exception=True):
@@ -75,11 +79,11 @@ class MusicUpdateAPIView(UpdateAPIView):
 class MusicRetrieveAPIView(RetrieveAPIView):
     queryset = Music.objects.all()
     serializer_class = music_seralizers.MusicListSeralizer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
 
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
-        if request.user == instance.author:
+        if type(self.request.user) != AnonymousUser and self.request.user == instance.author:
             return super().retrieve(request, *args, **kwargs)
         elif instance.is_public:
             return super().retrieve(request, *args, **kwargs)
@@ -98,5 +102,3 @@ class MusicDestroyAPIView(DestroyAPIView):
         else:
             status_code = status.HTTP_404_NOT_FOUND
         return Response(status=status_code)
-
-

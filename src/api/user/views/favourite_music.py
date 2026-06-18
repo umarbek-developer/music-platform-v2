@@ -15,7 +15,6 @@ class FavouriteListApiView(ListAPIView):
     def get_queryset(self):
         return self.queryset.filter(user=self.request.user)
 
-
 class FavouriteCreateAPIView(CreateAPIView):
     queryset = Favourite.objects.all()
     serializer_class = userfavourite_seralizers.FavouriteCreateSeralizer
@@ -24,6 +23,7 @@ class FavouriteCreateAPIView(CreateAPIView):
     def create(self, request):
         data = request.data
         data['user'] = request.user.id
+        data._mutable = True
         ser = self.serializer_class(data=data)
         ser.user = request.user
         if ser.is_valid(raise_exception=True):
@@ -32,8 +32,6 @@ class FavouriteCreateAPIView(CreateAPIView):
             "msg": "Favourite added successfully",
             "data": ser.data
         }, status=status.HTTP_201_CREATED)
-
-
 
 
 
@@ -49,4 +47,3 @@ class FavouriteDestroyAPIView(DestroyAPIView):
         else:
             status_code = status.HTTP_404_NOT_FOUND
         return Response(status=status_code)
-
