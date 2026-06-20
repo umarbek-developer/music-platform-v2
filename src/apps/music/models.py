@@ -29,6 +29,7 @@ class Playlist(models.Model):
         super().delete(*args, **kwargs)
     
 
+
 class Music(models.Model):
     name = models.CharField(max_length=255)
     author = models.ForeignKey("users.User", on_delete=models.SET_NULL, null=True)
