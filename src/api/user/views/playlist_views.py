@@ -19,6 +19,9 @@ class PlaylistListApiView(ListAPIView):
         queryset = super().get_queryset()
         if self.is_mine and type(self.request.user) != AnonymousUser:
             queryset = Playlist.objects.filter(author=self.request.user)
+        elif type(self.request.user) != AnonymousUser:
+            queryset2 = Playlist.objects.filter(author=self.request.user)
+            queryset = queryset2 | queryset
         return queryset
 
     def list(self, request, *args, **kwargs):

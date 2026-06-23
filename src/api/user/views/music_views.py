@@ -63,7 +63,7 @@ class MusicUpdateAPIView(UpdateAPIView):
         if request.user == instance.author:
             request.data._mutable = True
             request.data['author'] = request.user.id
-            ser = self.serializer_class(instance, data=request.data)
+            ser = self.serializer_class(instance, data=request.data, partial=True)
             if ser.is_valid(raise_exception=True):
                 ser.save()
             return Response({
