@@ -29,6 +29,8 @@ CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ORIGIN_ALLOW_ALL = True
 
+CSRF_TRUSTED_ORIGINS = ['https://deny-flagstick-sprig.ngrok-free.dev']
+
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "static"),
 ]

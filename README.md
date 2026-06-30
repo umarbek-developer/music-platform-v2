@@ -1,5 +1,15 @@
 # django-rest-music-platfor
 
+Auth kerak emas:
+- Login
+- Register
+- Otp
+- Forget password
+- Resend code
+
+
+Auth kerak:
+- 
 
 
 Pgainations
