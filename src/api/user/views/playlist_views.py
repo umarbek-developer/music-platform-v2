@@ -39,8 +39,11 @@ class PlaylistCreateAPIView(CreateAPIView):
     permission_classes = [IsAuthenticated]
 
     def create(self, request):
-        data = request.data
-        # data._mutable = True
+        # Copy into a plain dict: request.data is an *immutable* QueryDict for
+        # multipart uploads, so assigning `author` on it raised
+        # "This QueryDict instance is immutable" (HTTP 500). This works for both
+        # multipart and JSON bodies (files stay in request.data for multipart).
+        data = {key: request.data.get(key) for key in request.data}
         data['author'] = request.user.id
         ser = self.serializer_class(data=data)
         if ser.is_valid(raise_exception=True):
