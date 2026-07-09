@@ -1,6 +1,7 @@
 from rest_framework.generics import ListAPIView,\
     CreateAPIView, UpdateAPIView, DestroyAPIView, RetrieveAPIView
 from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.filters import SearchFilter
 from api.user.serializers import playlist_seralizers
 from rest_framework import status
 from rest_framework.response import Response
@@ -13,8 +14,10 @@ class PlaylistListApiView(ListAPIView):
     queryset = Playlist.objects.filter(is_public=True)
     serializer_class = playlist_seralizers.PlaylistListSeralizer
     permission_classes = [AllowAny]
+    filter_backends = [SearchFilter]
+    search_fields = ['name']
     is_mine = None
-    
+
     def get_queryset(self):
         queryset = super().get_queryset()
         if self.is_mine and type(self.request.user) != AnonymousUser:

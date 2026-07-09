@@ -39,6 +39,7 @@ class CustomUserManager(BaseUserManager):
 class User(AbstractUser):
     id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True)
     email = models.EmailField(unique=True, max_length=50)
+    avatar = models.ImageField(upload_to='avatars/', null=True, blank=True)
     telegram_id = models.CharField(max_length=50, null=True, blank=True)
     phone_number = models.CharField(max_length=13, null=True, blank=True)
     language = models.CharField(max_length=2, default='uz')

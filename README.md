@@ -12,16 +12,18 @@ Auth kerak:
 - 
 
 
-Pgainations
-
+Pagenations
 Permissions (custom)
 Filtering
 Django filter
 Ordering fields
+Docs: swagger
+ngrok
+
 Throotling
 AnonRateThrottle⁠, ⁠UserRateThrottle⁠
+
 Cacheing
-Docs: swagger
 Celery
 
 

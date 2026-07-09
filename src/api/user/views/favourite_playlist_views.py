@@ -22,9 +22,10 @@ class FavouriteplaylistCreateAPIView(CreateAPIView):
     permission_classes = [IsAuthenticated]
 
     def create(self, request):
-        data = request.data
+        # Plain dict so JSON and multipart bodies both work (request.data is a
+        # dict for JSON with no _mutable, an immutable QueryDict for multipart).
+        data = {key: request.data.get(key) for key in request.data}
         data['user'] = request.user.id
-        data._mutable = True
         ser = self.serializer_class(data=data)
         ser.user = request.user
         if ser.is_valid(raise_exception=True):

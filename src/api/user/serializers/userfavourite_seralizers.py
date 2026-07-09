@@ -1,9 +1,13 @@
-from rest_framework.serializers import ModelSerializer 
+from rest_framework.serializers import ModelSerializer
 from rest_framework.exceptions import ValidationError
 from apps.users.models import Favourite
+from api.user.serializers.music_seralizers import MusicListSeralizer
 
 
 class FavouriteListSeralizer(ModelSerializer):
+    # Nest the full track so the client can render the favourites list
+    # without an extra request per item.
+    music = MusicListSeralizer(read_only=True)
 
     class Meta:
         model = Favourite

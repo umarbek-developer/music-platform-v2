@@ -14,17 +14,16 @@ def send_otp_email(user_email, otp_code, otp_type='otp'):
     # 2. Plain text varianti (HTML qo'llab-quvvatlamaydigan pochta xizmatlari uchun)
     plain_message = strip_tags(html_message)
     subject = f"Tasdiqlash kodi"
-    from_email = settings.EMAIL_HOST_USER
+    # Fall back to DEFAULT_FROM_EMAIL if EMAIL_HOST_USER is not configured.
+    from_email = settings.EMAIL_HOST_USER or settings.DEFAULT_FROM_EMAIL
     recipient_list = [user_email]
-    # 3. Xatni yuborish
-    try:
-        send_mail(
-            subject,
-            plain_message,
-            from_email,
-            recipient_list,
-            html_message=html_message,
-            fail_silently=False,
-        )
-    except Exception as e:
-        print("error", e)
+    # 3. Send. Do NOT swallow errors: a failed send must propagate so the caller
+    #    can report a real error instead of a false "code sent" success.
+    send_mail(
+        subject,
+        plain_message,
+        from_email,
+        recipient_list,
+        html_message=html_message,
+        fail_silently=False,
+    )

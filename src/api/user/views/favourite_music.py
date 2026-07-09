@@ -21,9 +21,11 @@ class FavouriteCreateAPIView(CreateAPIView):
     permission_classes = [IsAuthenticated]
 
     def create(self, request):
-        data = request.data
+        # Copy into a plain dict so this works for both JSON and multipart
+        # bodies. (request.data is a dict for JSON, which has no _mutable, and
+        # an immutable QueryDict for multipart — the old code broke on both.)
+        data = {key: request.data.get(key) for key in request.data}
         data['user'] = request.user.id
-        data._mutable = True
         ser = self.serializer_class(data=data)
         ser.user = request.user
         if ser.is_valid(raise_exception=True):

@@ -17,7 +17,7 @@ class LoginView(APIView):
                 if user.is_active:
                     return Response({
                         "message": "Login successs",
-                        "user": UserLoginSerializer(user).data,
+                        "user": UserLoginSerializer(user, context={"request": request}).data,
                         "token": user.token()
                     }, status=status.HTTP_200_OK)
                 message = "User not verified!"

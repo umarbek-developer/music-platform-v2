@@ -1,6 +1,7 @@
 from rest_framework.generics import ListAPIView,\
     CreateAPIView, UpdateAPIView, DestroyAPIView, RetrieveAPIView
 from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.filters import SearchFilter
 from api.user.serializers import music_seralizers
 from rest_framework import status
 from rest_framework.response import Response
@@ -12,21 +13,29 @@ class MusicListApiView(ListAPIView):
     queryset = Music.objects.filter(is_public=True)
     serializer_class = music_seralizers.MusicListSeralizer
     permission_classes = [AllowAny]
+    filter_backends = [SearchFilter]
+    search_fields = ['name', 'source']
     is_mine = False
     playlist = None
 
     def get_queryset(self):
+        # NOTE: the previous global `music_list_cache` was removed — it was
+        # shared across all users and filters (leaking one user's list to
+        # everyone) and was never invalidated on upload (new tracks stayed
+        # invisible for 60s). The query below is cheap and correct.
         queryset = super().get_queryset()
         if self.is_mine and type(self.request.user) != AnonymousUser:
-            queryset =  Music.objects.filter(author=self.request.user)
+            queryset = Music.objects.filter(author=self.request.user)
         if self.playlist:
-            try: playlist = list(map(lambda d: int(d), self.playlist.split(",")))
-            except: return []
+            try:
+                playlist = list(map(int, self.playlist.split(",")))
+            except (ValueError, TypeError):
+                return Music.objects.none()
             queryset = queryset.filter(playlist__id__in=playlist).distinct()
         return queryset
 
     def list(self, request, *args, **kwargs):
-        self.is_mine =  request.GET.get("is_mine", False)
+        self.is_mine = request.GET.get("is_mine", False)
         self.playlist = request.GET.get("playlist", False)
         return super().list(request, *args, **kwargs)
 

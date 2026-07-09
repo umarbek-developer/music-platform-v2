@@ -4,6 +4,16 @@ from datetime import timedelta
 
 ALLOWED_HOSTS = ['*']
 
+# In development, print OTP/verification emails to the runserver console instead
+# of requiring real SMTP credentials. This makes the registration flow fully
+# testable locally. Production keeps the real SMTP backend from base.py — set
+# EMAIL_HOST (Gmail address) and EMAIL_PASSWORD (Gmail App Password) in .env.
+# Override by exporting EMAIL_BACKEND if you want to test real SMTP in dev.
+EMAIL_BACKEND = env(
+    "EMAIL_BACKEND",
+    default="django.core.mail.backends.console.EmailBackend",
+)
+
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(days=21),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=30),

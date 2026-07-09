@@ -8,17 +8,25 @@ from .models import Music, Playlist
 def update_music_duration(sender, instance, **kwargs):
     if instance.music_data:
         try:
-            # Bulutli xotiralarda ham ishlashi uchun fayl obyektini ochamiz
-            file = instance.music_data.open()
-            audio = mutagen.File(file)
-            
+            # Read metadata from the uploaded file object (works for cloud
+            # storage too, where .path is unavailable).
+            instance.music_data.open()
+            audio = mutagen.File(instance.music_data)
+
             if audio and audio.info:
                 instance.duration = int(audio.info.length)
         except Exception as e:
             print(f"Davomiylikni hisoblashda xatolik yuz berdi: {e}")
         finally:
-          
-            instance.music_data.close()
+            # CRITICAL: rewind but DO NOT close. This pre_save signal runs
+            # before Django's FileField writes the file to storage; closing
+            # the uploaded file here causes the subsequent storage write to
+            # fail with "ValueError: I/O operation on closed file", which
+            # surfaced as an HTTP 500 on every upload.
+            try:
+                instance.music_data.seek(0)
+            except Exception:
+                pass
 
 
 

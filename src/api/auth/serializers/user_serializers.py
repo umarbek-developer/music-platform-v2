@@ -43,10 +43,13 @@ class UserCreateSerializer(serializers.ModelSerializer):
 class UserLoginSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['email', 'first_name', 'last_name']
+        fields = ['email', 'first_name', 'last_name', 'avatar']
 
 
-class UserLoginSerializer(serializers.ModelSerializer):
+class ProfileSerializer(serializers.ModelSerializer):
+    """Read + update the authenticated user's profile (incl. avatar)."""
+
     class Meta:
         model = User
-        fields = ['email', 'first_name', 'last_name']
+        fields = ['email', 'first_name', 'last_name', 'avatar']
+        read_only_fields = ['email']

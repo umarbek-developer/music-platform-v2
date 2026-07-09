@@ -62,17 +62,27 @@ class RegisterViews(APIView):
         if ser.is_valid(raise_exception=True):
             ser.save()
             user = User.objects.get(email=email)
-            if otp_type == "otp":
-                self.send_otp_code(user, email)
+            # If the email can't be sent, roll back the user so they can retry
+            # cleanly, and return a meaningful error instead of a false success.
+            try:
+                if otp_type == "otp":
+                    self.send_otp_code(user, email)
+                    message = "Verifications code sent to your email"
+                else:
+                    self.send_otp_code_link(user, email)
+                    message = "Verifications link sent to your email"
+            except Exception as e:
+                user.delete()
+                print("OTP email send failed:", repr(e))
                 return Response({
-                    "message": "Verifications code sent to your email"
-                }, status=status.HTTP_201_CREATED)
-            else:
-                self.send_otp_code_link(user, email)
-                return Response({
-                    "message": "Verifications link sent to your email"
-                }, status=status.HTTP_201_CREATED)
-                
+                    "error": "Could not send the verification email. "
+                             "Please try again later or contact support."
+                }, status=status.HTTP_502_BAD_GATEWAY)
+
+            return Response({
+                "message": message
+            }, status=status.HTTP_201_CREATED)
+
         return Response({
             "error": "Something went wrong"
         }, status=status.HTTP_400_BAD_REQUEST)
