@@ -126,6 +126,13 @@ REST_FRAMEWORK = {
     # 'UNAUTHENTICATED_USER': 'users.models.AnonymousUser',
 }
 
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Music Platform API',
+    'DESCRIPTION': 'REST API for the Django music platform.',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+}
+
 
 
 LANGUAGE_CODE = 'en-us'
