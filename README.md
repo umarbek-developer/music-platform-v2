@@ -17,7 +17,7 @@ Permissions (custom)
 Filtering
 Django filter
 Ordering fields
-Docs: swagger
+Docs: drf-spectacular (OpenAPI 3) — schema at /api/v1/schema/, Swagger UI at /api/v1/docs/
 ngrok
 
 Throotling
